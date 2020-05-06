@@ -52,6 +52,9 @@ const (
 	PARAM_RECOVERED         = "recovered"
 	PARAM_QUERY_AS_MAP_LIST = "queryAsMapList" // boolean
 
+
+	PARAM_PASSWORD       = "password"
+
 	PARAM_SQL               = "sql"
 	PARAM_SQL_ARGUMENTS     = "arguments"
 	PARAM_NO_RESULT         = "noResult"
@@ -200,11 +203,15 @@ func (p *SqflitePlugin) handleOpenDatabase(arguments interface{}) (reply interfa
 	if args, ok = arguments.(map[interface{}]interface{}); !ok {
 		return nil, errors.New("invalid arguments")
 	}
+	var password string
 	var dbpath string
 	var readOnly bool
 	var singleInstance bool
 	if dpath, ok := args[PARAM_PATH]; ok {
 		dbpath = dpath.(string)
+	}
+	if password, ok := args[PARAM_PATH]; ok {
+		password = password.(string)
 	}
 	if rdo, ok := args[PARAM_READ_ONLY]; ok {
 		readOnly = rdo.(bool)
@@ -236,7 +243,7 @@ func (p *SqflitePlugin) handleOpenDatabase(arguments interface{}) (reply interfa
 		}
 	}
 	var engine *sql.DB
-	engine, err = sql.Open("sqlite3", dbpath)
+	engine, err = sql.Open("sqlite3", dbpath+"?_key="+password)
 	if err != nil {
 		return nil, err
 	}
